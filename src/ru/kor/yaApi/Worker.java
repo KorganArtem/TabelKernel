@@ -87,13 +87,18 @@ public class Worker {
                     +" IdINCRS:"+ driverIdInSRM); 
             if(driverIdInSRM!=0){
                 sw.setYaId(driverId, driverIdInSRM);
-                System.err.println("Write into base");
+                System.err.println("Write into drivers list");
+            }
+            else{
+                sw.addTMPList(driverId, driver.get("FirstName").getAsString(), 
+                        driver.get("LastName").getAsString(), driver.get("Phones").getAsString());
+                System.err.println("Write into drivers list");
             }
         }
         catch(Exception ex){
             System.out.println(ex.getMessage());
         }
-    }
+    } 
     private JsonObject jsonMaker(String inputString){
         JsonParser parser = new JsonParser();
         JsonObject jsonObj;

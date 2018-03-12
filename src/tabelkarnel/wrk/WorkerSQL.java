@@ -8,7 +8,7 @@ package tabelkarnel.wrk;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.SQLException; 
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
@@ -119,7 +119,7 @@ public class WorkerSQL {
 
     public boolean checkYaIdInBase(String yaId) throws SQLException {
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT `driver_id` FROM `drivers` WHERE yaId ='"+yaId+"'");
+        ResultSet rs = st.executeQuery("SELECT `driver_id` FROM `drivers` WHERE `yaId` ='"+yaId+"'");
         if(rs.next()){
             if(rs.getInt("driver_id")!=0) {
                rs.close();
@@ -129,6 +129,13 @@ public class WorkerSQL {
         }
         rs.close();
         st.close();
+        Statement sttmp = con.createStatement();
+        ResultSet rstmp = sttmp.executeQuery("SELECT * FROM `tmp_driver` WHERE `yaId` ='"+yaId+"'");
+        if(rstmp.next()){
+               rstmp.close();
+               rstmp.close();
+               return true;
+        }
         return false;
     }
 
@@ -145,5 +152,11 @@ public class WorkerSQL {
         Statement st = con.createStatement();
         System.out.println("UPDATE ");
         st.execute("UPDATE drivers SET `yaBalace`="+balance+" WHERE `yaId`='"+yaId+"'");
+    }
+
+    public void addTMPList(String driverId, String firstName, String lastName, String phone) throws SQLException {
+        Statement st = con.createStatement();
+        st.execute("INSERT INTO `tmp_driver` (`phone`, `firstName`, `lastName`, `yaId`) "
+                + " VALUES ('"+phone+"', '"+firstName+"', '"+lastName+"', '"+driverId+"')");
     }
 }

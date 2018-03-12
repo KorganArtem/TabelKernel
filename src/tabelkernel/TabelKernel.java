@@ -8,6 +8,7 @@ package tabelkernel;
 import java.io.IOException;
 import java.net.ProtocolException;
 import java.sql.SQLException;
+import java.util.Date;
 import ru.kor.yaApi.Worker;
 import tabelkarnel.wrk.WorkerSQL;
 
@@ -22,11 +23,14 @@ public class TabelKernel {
      */
     public static void main(String[] args) throws ClassNotFoundException, SQLException, ProtocolException, IOException {
         // TODO code application logic here
+        long startTime = (new Date().getTime()/1000);
         WorkerSQL wsql = new WorkerSQL();
         Worker wrk = new Worker();
         wsql.addAccrual();
         wrk.checkNewDriver();
         wrk.getAllBalance();
+        long endTime = (new Date().getTime()/1000);
+        System.out.println("Time taken:"+(endTime-startTime));
     }
     
 }
