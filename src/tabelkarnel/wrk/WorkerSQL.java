@@ -84,8 +84,9 @@ public class WorkerSQL {
             }
             System.out.println("Driver id = "+rsGetDriverAndRent.getInt("driver_id")+" Driver Last Name = "+rsGetDriverAndRent.getString("driver_lastname")+" WorkDay = "+ number +"  RentSum = "+rentSum);
             Statement stAddAccrual = con.createStatement();
-            stAddAccrual.execute("INSERT INTO `pay` (`type`, `date`, `source`, `sum`, `driverId`) "
-                    + "VALUES ('2', NOW(), 0, '"+rentSum+"', '"+rsGetDriverAndRent.getInt("driver_id")+"')");
+            int balanceNow = rsGetDriverAndRent.getInt("driver_current_debt")+rentSum;
+            stAddAccrual.execute("INSERT INTO `pay` (`type`, `date`, `source`, `sum`, `driverId`, `balance`) "
+                    + "VALUES ('2', NOW(), 0, '"+rentSum+"', '"+rsGetDriverAndRent.getInt("driver_id")+"', "+balanceNow+")");
             Statement stUpdateCurrentDebt = con.createStatement();
             stUpdateCurrentDebt.execute("UPDATE `drivers` SET `driver_current_debt`=(SELECT sum(`sum`) FROM `pay` WHERE driverId="+rsGetDriverAndRent.getInt("driver_id")+" and type!=3), "
                     + "`driverDayOff`='"+dayOff+"' "
