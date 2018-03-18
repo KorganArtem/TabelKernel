@@ -33,7 +33,7 @@ public class Worker {
         sw = new WorkerSQL();
     }
     public Map getDriverListInYa() throws MalformedURLException, IOException, SQLException{
-        Map<String, String> driverBalanceList = new HashMap<String, String>();
+        Map<String, Integer> driverBalanceList = new HashMap<String, Integer>();
         String url = "https://taximeter.yandex.rostaxi.org/api/driver/balance?apikey="+apiKey;
         URL obj = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
@@ -50,7 +50,7 @@ public class Worker {
         in.close();
         JsonObject driverList = jsonMaker(response.toString());
         for(Map.Entry<String, JsonElement> entry : driverList.entrySet()){
-            driverBalanceList.put(entry.getKey(), entry.getValue().getAsString());
+            driverBalanceList.put(entry.getKey(), entry.getValue().getAsInt());
         }
         System.out.println("I have take driver/balance list");
         return driverBalanceList;

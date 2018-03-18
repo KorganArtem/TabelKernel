@@ -160,4 +160,48 @@ public class WorkerSQL {
         st.execute("INSERT INTO `tmp_driver` (`phone`, `firstName`, `lastName`, `yaId`) "
                 + " VALUES ('"+phone+"', '"+firstName+"', '"+lastName+"', '"+driverId+"')");
     }
+
+    public Map getDriverBalance() throws SQLException {
+        Map driverList;
+        driverList = new HashMap<Integer, Map>();
+        try (Statement st = con.createStatement()) {
+            ResultSet rs = st.executeQuery("SELECT `driver_id`, `driver_current_debt`, `yaId`  FROM `drivers` "
+                    + "WHERE `yaId` IS NOT NULL AND `driver_current_debt` < 0 AND `driver_deleted` = 0");
+            while(rs.next()){
+                Map row = new HashMap<Integer, String>();
+                row.put("yaId", rs.getString("yaId"));
+                row.put("debt", rs.getInt("driver_current_debt"));
+                driverList.put(rs.getInt("driver_id"), row);
+            }   
+            rs.close();
+        }
+        return driverList;
+    }
+    public void addPayDriver(int driverId, int sum, int source) throws SQLException{
+        try{
+            int balanceDriver = 0;
+            if(source!=6){
+                Statement stGetBalance = con.createStatement();
+                ResultSet rsGetBalance = stGetBalance.executeQuery("SELECT `driver_current_debt` FROM `drivers` "
+                    + "WHERE `driver_id`="+driverId);
+                if(rsGetBalance.next())
+                    balanceDriver=rsGetBalance.getInt("driver_current_debt")+sum;
+            }
+            Statement st = con.createStatement();
+            st.execute("INSERT INTO `pay` (`type`, `date`, `source`, `sum`, `driverId`, `user`, `balance`) "
+                    + "VALUES ('1', NOW(), '"+source+"', '"+sum+"', '"+driverId+"', '0', '"+balanceDriver+"')");
+            st.close();
+            if(source==6){
+               Statement stUpdateCurrentDebt = con.createStatement();
+                stUpdateCurrentDebt.execute("UPDATE `drivers` SET `driver_deposit`=`driver_deposit`-"+sum+" WHERE `driver_id`="+driverId);
+                stUpdateCurrentDebt.close(); 
+            }
+            Statement stUpdateCurrentDebt = con.createStatement();
+            stUpdateCurrentDebt.execute("UPDATE `drivers` SET `driver_current_debt`=(SELECT sum(`sum`) FROM `pay` WHERE driverId="+driverId+" and type!=3) WHERE `driver_id`="+driverId);
+            stUpdateCurrentDebt.close();
+        }
+        catch(Exception ex){
+            System.out.println(ex.getMessage());
+        }
+    }
 }
