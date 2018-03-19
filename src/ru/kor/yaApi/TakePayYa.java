@@ -47,23 +47,26 @@ public class TakePayYa {
                 System.out.println("DriverId: "+key + "  DriverDebt:" + row.get("debt")
                     + "  DriverYaId: " + row.get("yaId")+" yaBalance:"+driverBalanceYa.get(row.get("yaId")));
                 System.out.println("I will take pay:"+takenSum);
-                if(minusYaBalance("cf652a31be7e47fa8cd0c56512111932", 0)){
-                    sw.addPayDriver(91, takenSum, 2);
+                if(minusYaBalance((String) row.get("yaId"), takenSum)){
+                    sw.addPayDriver((int) key, takenSum, 2);
                 }
             }
         }
     }
     boolean minusYaBalance(String yaId, int sum) throws MalformedURLException, IOException{
         String url = "https://taximeter.yandex.rostaxi.org/api/driver/balance/minus?apikey="+apiKey
-                +"&driver="+yaId+"&sum="+sum+"&description=getSystem";
+                +"&driver="+yaId+"&sum="+sum+"&description=Arenda";
 
         URL obj = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
         connection.setRequestMethod("GET");
         connection.connect();
-        if(connection.getResponseCode()==200)
+        if(connection.getResponseCode()==200){
             return true;
-        else
+        }
+        else{
+            System.err.println("No taken!!!"+connection.getResponseCode());
             return false;
+        }
     }
 }
