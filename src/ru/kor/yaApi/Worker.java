@@ -110,14 +110,12 @@ public class Worker {
         Map driverBalanceList = this.getDriverListInYa();
         Set keysDriver = driverBalanceList.keySet();
         for(Object key : keysDriver){
-            System.out.println(key + "  "+driverBalanceList.get(key));
             sw.updateDriverBalance((String) key, driverBalanceList.get(key).toString());
         }
     }
     public void getAllBalance(Map driverBalanceList) throws SQLException, IOException {
         Set keysDriver = driverBalanceList.keySet();
         for(Object key : keysDriver){
-            System.out.println(key + "  "+driverBalanceList.get(key));
             sw.updateDriverBalance((String) key, driverBalanceList.get(key).toString());
         }
     }
@@ -127,13 +125,11 @@ public class Worker {
         Set keysDriver = driverBalanceList.keySet();
         for(Object key : keysDriver){
             counter++;
-            System.out.println("PP:"+counter + "  ID:" +key + "  Balance:"+driverBalanceList.get(key));
             if(!sw.checkYaIdInBase((String) key)){
+                System.out.println("PP:"+counter + "  ID:" +key + "  Balance:"+driverBalanceList.get(key));
                 System.out.println("\t New driver");
                 driverDataGet((String) key);
             }
-            else
-                System.out.println("\t In base already!");
         } 
         getAllBalance(driverBalanceList);
     }

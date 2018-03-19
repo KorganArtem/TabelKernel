@@ -151,7 +151,6 @@ public class WorkerSQL {
     }
     public void updateDriverBalance(String yaId, String balance) throws SQLException{
         Statement st = con.createStatement();
-        System.out.println("UPDATE ");
         st.execute("UPDATE drivers SET `yaBalace`="+balance+" WHERE `yaId`='"+yaId+"'");
     }
 
@@ -202,6 +201,19 @@ public class WorkerSQL {
         }
         catch(Exception ex){
             System.out.println(ex.getMessage());
+        }
+    }
+    public void tmpToDrivers() throws SQLException{
+        Statement stUpdate = con.createStatement();
+        Statement st = con.createStatement();
+        ResultSet rs = st.executeQuery("SELECT * FROM `tmp_driver`");
+        while(rs.next()){
+            String phone = rs.getString("phone").substring(2);
+            int driverId = getDriverIdInTable(phone);
+            if(driverId>0){
+                stUpdate.execute("UPDATE drivers SET yaId = '"+rs.getString("yaId")+"' WHERE driver_id="+driverId);
+                stUpdate.execute("DELETE FROM tmp_driver WHERE phone='"+rs.getString("phone")+"'");
+            }
         }
     }
 }

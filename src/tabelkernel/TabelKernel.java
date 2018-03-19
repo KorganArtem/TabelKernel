@@ -27,12 +27,17 @@ public class TabelKernel {
         long startTime = (new Date().getTime()/1000);
         WorkerSQL wsql = new WorkerSQL();
         Worker wrk = new Worker();
+        System.out.println("Start add accrual!");
         wsql.addAccrual();
-        //wrk.checkNewDriver();
-        wrk.getAllBalance();
+        wsql.tmpToDrivers();
         TakePayYa tpy; 
         tpy = new TakePayYa(wrk.getDriverListInYa());
+        System.out.println("Start take YA pay!");
         tpy.takePay();
+        System.out.println("Start check new driver in YA!");
+        wrk.checkNewDriver();
+        System.out.println("Start update driver balance in YA!");
+        wrk.getAllBalance();
        long endTime = (new Date().getTime()/1000);
         System.out.println("Time taken:"+(endTime-startTime));
     }
