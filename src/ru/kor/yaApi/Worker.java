@@ -28,9 +28,10 @@ import tabelkarnel.wrk.WorkerSQL;
  */
 public class Worker {
     WorkerSQL sw = null;
-    String apiKey = "d8435ac61cda4b9fa760e8e6c0ccbc1e";
-    public Worker() throws ClassNotFoundException, SQLException{
+    String apiKey;
+    public Worker(String key) throws ClassNotFoundException, SQLException{
         sw = new WorkerSQL();
+        apiKey = key;
     }
     public Map getDriverListInYa() throws MalformedURLException, IOException, SQLException{
         Map<String, Integer> driverBalanceList = new HashMap<String, Integer>();

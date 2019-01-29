@@ -26,18 +26,26 @@ public class TabelKernel {
         // TODO code application logic here
         long startTime = (new Date().getTime()/1000);
         WorkerSQL wsql = new WorkerSQL();
-        Worker wrk = new Worker();
-        System.out.println("Start add accrual!");
-        wsql.addAccrual();
+        
+        for(int ind=0; ind < args.length; ind++){
+            if(args[ind].equals("-a")){
+                System.out.println("Start add accrual!");
+                wsql.addAccrual();
+                continue;
+            }
+            if(args[ind].equals("-y")){
+                Worker wrk = new Worker(args[ind+1]);
+                TakePayYa tpy; 
+                tpy = new TakePayYa(args[ind+1]);
+                System.out.println("Start take YA pay!");
+                tpy.takePay(wrk.getDriverListInYa());
+                System.out.println("Start check new driver in YA!");
+                wrk.checkNewDriver();
+                System.out.println("Start update driver balance in YA!");
+                wrk.getAllBalance();
+            }
+        }
         wsql.tmpToDrivers();
-        TakePayYa tpy; 
-        tpy = new TakePayYa(wrk.getDriverListInYa());
-        System.out.println("Start take YA pay!");
-        tpy.takePay();
-        System.out.println("Start check new driver in YA!");
-        wrk.checkNewDriver();
-        System.out.println("Start update driver balance in YA!");
-        wrk.getAllBalance();
        long endTime = (new Date().getTime()/1000);
         System.out.println("Time taken:"+(endTime-startTime));
     }

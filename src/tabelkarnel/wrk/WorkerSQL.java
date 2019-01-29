@@ -42,6 +42,7 @@ public class WorkerSQL {
         }
     }
     public void addAccrual() throws SQLException{
+        System.out.println("I am in addAccrul!");
         Statement lockTable = con.createStatement();
         ResultSet rsLock = lockTable.executeQuery("SELECT `paramValue` FROM `param` WHERE `paramName` = 'workingAccural'");
         if(rsLock.next()){
@@ -52,6 +53,7 @@ public class WorkerSQL {
                 stLock.close();
             }
             else{
+                System.out.println("Param is set");
                 rsLock.close();
                 lockTable.close();
                 return;
@@ -63,7 +65,8 @@ public class WorkerSQL {
         ResultSet rsGetDriverAndRent = stGetDriverAndRent.executeQuery("SELECT `drivers`.*, TO_DAYS(current_date())-TO_DAYS(driverStartDate)+1 as `dayWork` FROM `drivers` "
                 + "WHERE `driver_deleted`=0  "
                + "AND `driver_id` NOT IN (SELECT `driverId` FROM `pay` WHERE `type`=2 and `date` > CURDATE())");
-               System.out.println("Got driver list");
+        System.out.println("Got driver list");
+               
         while(rsGetDriverAndRent.next()){
             int rentSum;
             int dayOff;
@@ -120,7 +123,7 @@ public class WorkerSQL {
 
     public boolean checkYaIdInBase(String yaId) throws SQLException {
         Statement st = con.createStatement();
-        ResultSet rs = st.executeQuery("SELECT `driver_id` FROM `drivers` WHERE `yaId` ='"+yaId+"'");
+        ResultSet rs = st.executeQuery("SELECT `driver_id` FROM `drivers` WHERE `yaId` ='"+yaId+"' AND driver_deleted = 0");
         if(rs.next()){
             if(rs.getInt("driver_id")!=0) {
                rs.close();

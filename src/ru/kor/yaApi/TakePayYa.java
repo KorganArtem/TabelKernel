@@ -24,32 +24,38 @@ import tabelkarnel.wrk.WorkerSQL;
 public class TakePayYa {
     Map<String, Integer> driverBalanceYa = new HashMap<>();
     Map<Integer, Map> driverList = new HashMap<>();
-    String apiKey = "d8435ac61cda4b9fa760e8e6c0ccbc1e";
+    String apiKey;
     WorkerSQL sw = new WorkerSQL();
-    public TakePayYa( Map dB) throws ClassNotFoundException, SQLException{
-        driverBalanceYa = dB;
+    public TakePayYa( String key) throws ClassNotFoundException, SQLException{
+        apiKey = key;
         driverList = sw.getDriverBalance();
     }
-    public void takePay() throws IOException, SQLException{
+    public void takePay(Map dB) throws IOException, SQLException{
+        driverBalanceYa = dB;
         Set keysDriver = driverList.keySet();
         for(Object key : keysDriver){
             Map row = (Map) driverList.get(key);
-            int yaBalance = (int) driverBalanceYa.get(row.get("yaId"));
-            int driverDebt = (int) row.get("debt");
-            int takenSum = 0;
-            if(yaBalance > 200 && (yaBalance-200) > 100){
-                if((driverDebt*-1) < (yaBalance-200)){
-                    takenSum = driverDebt*-1;
+            try{
+                int yaBalance = (int) driverBalanceYa.get(row.get("yaId"));
+                int driverDebt = (int) row.get("debt");
+                int takenSum = 0;
+                if(yaBalance > 200 && (yaBalance-200) > 100){
+                    if((driverDebt*-1) < (yaBalance-200)){
+                        takenSum = driverDebt*-1;
+                    }
+                    else{
+                        takenSum =(yaBalance-200);
+                    }
+                    System.out.println("DriverId: "+key + "  DriverDebt:" + row.get("debt")
+                        + "  DriverYaId: " + row.get("yaId")+" yaBalance:"+driverBalanceYa.get(row.get("yaId")));
+                    System.out.println("I will take pay:"+takenSum);
+                    if(minusYaBalance((String) row.get("yaId"), takenSum)){
+                        sw.addPayDriver((int) key, takenSum, 2);
+                    }
                 }
-                else{
-                    takenSum =(yaBalance-200);
-                }
-                System.out.println("DriverId: "+key + "  DriverDebt:" + row.get("debt")
-                    + "  DriverYaId: " + row.get("yaId")+" yaBalance:"+driverBalanceYa.get(row.get("yaId")));
-                System.out.println("I will take pay:"+takenSum);
-                if(minusYaBalance((String) row.get("yaId"), takenSum)){
-                    sw.addPayDriver((int) key, takenSum, 2);
-                }
+            }
+            catch(Exception ex){
+                System.out.println(ex.getMessage()+"");
             }
         }
     }
