@@ -163,21 +163,30 @@ public class WorkerSQL {
                 + " VALUES ('"+phone+"', '"+firstName+"', '"+lastName+"', '"+driverId+"')");
     }
 
-    public Map getDriverBalance() throws SQLException {
-        Map driverList;
-        driverList = new HashMap<Integer, Map>();
+        
+    public double getDriverBalance(String phone) throws SQLException {
+        double currentDebt=0;
         try (Statement st = con.createStatement()) {
             ResultSet rs = st.executeQuery("SELECT `driver_id`, `driver_current_debt`, `yaId`  FROM `drivers` "
-                    + "WHERE `yaId` IS NOT NULL AND `driver_current_debt` < 0 AND `driver_deleted` = 0");
-            while(rs.next()){
-                Map row = new HashMap<Integer, String>();
-                row.put("yaId", rs.getString("yaId"));
-                row.put("debt", rs.getInt("driver_current_debt"));
-                driverList.put(rs.getInt("driver_id"), row);
+                    + "WHERE `driver_phone_number` like '%"+phone+"' AND `driver_current_debt` < 0 AND `driver_deleted` = 0");
+            if(rs.next()){
+                 currentDebt = rs.getDouble("driver_current_debt");
             }   
             rs.close();
         }
-        return driverList;
+        return currentDebt;
+    }    
+    public int getDriverId(String phone) throws SQLException {
+        int driverId=0;
+        try (Statement st = con.createStatement()) {
+            ResultSet rs = st.executeQuery("SELECT `driver_id`, `driver_current_debt`, `yaId`  FROM `drivers` "
+                    + "WHERE `driver_phone_number` like '%"+phone+"' AND `driver_current_debt` < 0 AND `driver_deleted` = 0");
+            if(rs.next()){
+                 driverId = rs.getInt("driver_id");
+            }   
+            rs.close();
+        }
+        return driverId;
     }
     public void addPayDriver(int driverId, int sum, int source) throws SQLException{
         try{

@@ -26,14 +26,30 @@ import tabelkarnel.wrk.WorkerSQL;
  *
  * @author korgan
  */
-public class Worker {
+public class WorkerNew {
     WorkerSQL sw = null;
     String apiKey;
-    public Worker(String key) throws ClassNotFoundException, SQLException{
+    public WorkerNew(String key) throws ClassNotFoundException, SQLException{
         sw = new WorkerSQL();
         apiKey = key;
     }
-    public Map getDriverListInYa() throws MalformedURLException, IOException, SQLException{
+    public boolean minusYaBalance(String yaId, int sum) throws MalformedURLException, IOException{
+        String url = "https://taximeter.yandex.rostaxi.org/api/driver/balance/minus?apikey="+apiKey
+                +"&driver="+yaId+"&sum="+sum+"&description=Arenda";
+
+        URL obj = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+        connection.setRequestMethod("GET");
+        connection.connect();
+        if(connection.getResponseCode()==200){
+            return true;
+        }
+        else{
+            System.err.println("No taken!!!"+connection.getResponseCode());
+            return false;
+        }
+    }
+    public Map<String, Integer> getDriverListInYa() throws MalformedURLException, IOException, SQLException{
         Map<String, Integer> driverBalanceList = new HashMap<String, Integer>();
         String url = "https://taximeter.yandex.rostaxi.org/api/driver/balance?apikey="+apiKey;
         URL obj = new URL(url);
@@ -99,6 +115,50 @@ public class Worker {
         catch(Exception ex){
             System.out.println(ex.getMessage());
         }
+    } 
+    public String getDriverPhone(String driverId) throws MalformedURLException, IOException{
+        String url = "https://taximeter.yandex.rostaxi.org/api/driver/get?apikey="+apiKey+"&id="+driverId;
+
+        URL obj = new URL(url);
+        HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
+
+        connection.setRequestMethod("GET");
+
+        BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        JsonObject driverData = jsonMaker(response.toString());
+        JsonObject driver = (JsonObject) driverData.get("driver");
+        String phone = "";
+        try{
+            phone = driver.get("Phones").toString().substring(3, 13);
+            return phone;
+            /*
+            System.out.println("\t First Name:" +driver.get("FirstName").getAsString()
+                    + " LastName:" +driver.get("LastName").getAsString()
+                    +" PhoneInYa:" +driver.get("Phones").getAsString()
+                    + " PhoneForSearch:" +phone
+                    +" Balance:"+ driverData.get("balance")
+                    +" IdINCRS:"+ driverIdInSRM); 
+            if(driverIdInSRM!=0){
+                sw.setYaId(driverId, driverIdInSRM);
+                System.err.println("Write into drivers list");
+            }
+            else{
+                sw.addTMPList(driverId, driver.get("FirstName").getAsString(), 
+                        driver.get("LastName").getAsString(), driver.get("Phones").getAsString());
+                System.err.println("Write into drivers list");
+            }*/
+        }
+        catch(Exception ex){
+            System.out.println(ex.getMessage());
+        }
+        return "";
     } 
     private JsonObject jsonMaker(String inputString){
         JsonParser parser = new JsonParser();
