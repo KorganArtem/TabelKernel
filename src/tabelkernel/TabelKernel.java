@@ -56,7 +56,7 @@ public class TabelKernel {
                             wsql.addPayDriver(wsql.getDriverId(phone), (int) takenSum, 2);
                     }
                     
-                    System.out.println(phone + "  " + entr.getKey()+" yaBalanc: "+yaBalance+" driverDebt: "+driverDebt+" takenSum: "+takenSum);
+                    System.out.println("\t"+phone + "  yaBalanc: "+yaBalance+" driverDebt: "+driverDebt+" takenSum: "+takenSum);
                 }
                 /*Worker wrk = new Worker(args[ind+1]);
                 TakePayYa tpy; 
